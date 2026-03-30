@@ -59,7 +59,7 @@ export default function FAQs() {
       questions: [
         {
           q: "What is your return policy?",
-          a: "We offer a 30-day money-back guarantee. If you are not completely satisfied, you may return unused items in their original packaging within 30 days of receipt. Please visit our Shipping & Returns page for detailed instructions.",
+          a: "We offer a 3-day money-back guarantee. If you are not completely satisfied, you may return unused items in their original packaging within 3 days of receipt. After 3 days, we follow a Strict No Return, No Exchange, and No Refund policy. Please visit our Shipping & Returns page for detailed instructions.",
         },
         {
           q: "How long does a refund take to process?",

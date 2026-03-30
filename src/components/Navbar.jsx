@@ -129,6 +129,8 @@ export function Navbar() {
     { name: "Luggage", href: "/luggage" },
     { name: "Backpacks", href: "/backpacks" },
     { name: "Duffles", href: "/duffles" },
+    { name: "Office", href: "/office"},
+    { name: "Accessories", href: "/accessories"},
     { name: "Track Order", href: "/track-order" },
   ];
 

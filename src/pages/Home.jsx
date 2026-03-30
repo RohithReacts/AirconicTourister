@@ -53,6 +53,9 @@ function Home() {
             badge={product.discount > 0 ? `Save ${product.discount}%` : null}
             icon={true}
             image={product.image || "https://placehold.co/400x400"}
+            price={product.salePrice}
+            mrp={product.pricemrp}
+            color={product.color}
           />
         )),
       ],
@@ -77,6 +80,9 @@ function Home() {
             badge="New"
             icon={true}
             image={product.image || "https://placehold.co/400x400"}
+            price={product.salePrice}
+            mrp={product.pricemrp}
+            color={product.color}
           />
         )),
       ],
@@ -120,6 +126,8 @@ function Home() {
                 opts={{
                   loop: true,
                   align: "center",
+                  autoplay: true,
+                  autoplayInterval: 1000,
                 }}
               />
             </div>

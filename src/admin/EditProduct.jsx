@@ -22,9 +22,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function EditProduct() {
-  useDocumentTitle(`Edit ${form.title || "Product"}`);
   const { id } = useParams();
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -32,13 +38,21 @@ export default function EditProduct() {
     description: "",
     pricemrp: "",
     image: "",
+    image2: "",
+    image3: "",
+    image4: "",
+    image5: "",
+    image6: "",
     category: "",
     size: "",
     color: "",
     stock: "",
     salePrice: "",
     discount: "",
+    brand: "",
   });
+
+  useDocumentTitle(`Edit ${form.title || "Product"}`);
 
   const fetchProduct = async () => {
     try {
@@ -132,7 +146,6 @@ export default function EditProduct() {
                     className="min-h-[150px] resize-none"
                     value={form.description}
                     onChange={handleChange}
-                    required
                   />
                 </div>
               </CardContent>
@@ -199,30 +212,94 @@ export default function EditProduct() {
               <CardContent className="space-y-4 mt-6">
                 <div className="grid gap-2">
                   <Label htmlFor="category">Category</Label>
-                  <Input
-                    id="category"
-                    name="category"
-                    placeholder="e.g. Backpacks"
+                  <Select
                     value={form.category}
-                    onChange={handleChange}
+                    onValueChange={(value) =>
+                      setForm({ ...form, category: value })
+                    }
                     required
-                  />
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="backpacks">Backpacks</SelectItem>
+                      <SelectItem value="hard-luggage">Hard-Luggage</SelectItem>
+                      <SelectItem value="duffles">Duffles</SelectItem>
+                      <SelectItem value="soft-luggage">Soft-Luggage</SelectItem>
+                      <SelectItem value="office">Office</SelectItem>
+                      <SelectItem value="accessories">Accessories</SelectItem>
+                      <SelectItem value="kids">Kids</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </div>
 
             <div>
               <CardContent>
-                <div className="grid gap-2 mt-6">
-                  <Label htmlFor="image">Image URL</Label>
-                  <Input
-                    id="image"
-                    name="image"
-                    placeholder="https://example.com/image.jpg"
-                    value={form.image}
-                    onChange={handleChange}
-                    required
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                  <div className="grid gap-2">
+                    <Label htmlFor="image">Image URL 1 (Main)</Label>
+                    <Input
+                      id="image"
+                      name="image"
+                      placeholder="https://example.com/image1.jpg"
+                      value={form.image}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="image2">Image URL 2</Label>
+                    <Input
+                      id="image2"
+                      name="image2"
+                      placeholder="https://example.com/image2.jpg"
+                      value={form.image2}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="image3">Image URL 3</Label>
+                    <Input
+                      id="image3"
+                      name="image3"
+                      placeholder="https://example.com/image3.jpg"
+                      value={form.image3}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="image4">Image URL 4</Label>
+                    <Input
+                      id="image4"
+                      name="image4"
+                      placeholder="https://example.com/image4.jpg"
+                      value={form.image4}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="image5">Image URL 5</Label>
+                    <Input
+                      id="image5"
+                      name="image5"
+                      placeholder="https://example.com/image5.jpg"
+                      value={form.image5}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="image6">Image URL 6</Label>
+                    <Input
+                      id="image6"
+                      name="image6"
+                      placeholder="https://example.com/image6.jpg"
+                      value={form.image6}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </div>
@@ -231,15 +308,63 @@ export default function EditProduct() {
               <CardContent className="space-y-4">
                 <div className="grid gap-2 mt-6">
                   <Label htmlFor="size">Size</Label>
-                  <Input
-                    id="size"
-                    name="size"
-                    placeholder="e.g. Large / 15-inch"
+                  <Select
                     value={form.size}
-                    onChange={handleChange}
-                  />
+                    onValueChange={(value) => setForm({ ...form, size: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="78">78 Cms</SelectItem>
+                      <SelectItem value="77">77 Cms</SelectItem>
+                      <SelectItem value="67">67 Cms</SelectItem>
+                      <SelectItem value="68">68 Cms</SelectItem>
+                      <SelectItem value="55">55 Cms</SelectItem>
+                      <SelectItem value="52">52 Cms</SelectItem>
+                      <SelectItem value="29">29 Cms</SelectItem>
+                      <SelectItem value="31">31 Cms</SelectItem>
+                      <SelectItem value="32.5">32.5 Cms</SelectItem>
+                      <SelectItem value="40">40 Cms</SelectItem>
+                      <SelectItem value="47">47 Cms</SelectItem>
+                      <SelectItem value="56">56 Cms</SelectItem>
+                      <SelectItem value="58">58 Cms</SelectItem>
+                      <SelectItem value="59">59 Cms</SelectItem>
+                      <SelectItem value="60">60 Cms</SelectItem>
+                      <SelectItem value="66">66 Cms</SelectItem>
+                      <SelectItem value="69">69 Cms</SelectItem>
+                      <SelectItem value="70">70 Cms</SelectItem>
+                      <SelectItem value="75">75 Cms</SelectItem>
+                      <SelectItem value="76">76 Cms</SelectItem>
+                      <SelectItem value="79">79 Cms</SelectItem>
+                      <SelectItem value="80">80 Cms</SelectItem>
+                      <SelectItem value="81">81 Cms</SelectItem>
+                      <SelectItem value="82">82 Cms</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="grid gap-2">
+                <div className="grid gap-2 mt-2">
+                  <Label htmlFor="brand">Brand</Label>
+                  <Select
+                    value={form.brand}
+                    onValueChange={(value) =>
+                      setForm({ ...form, brand: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select brand" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="american-tourister">
+                        American Tourister
+                      </SelectItem>
+                      <SelectItem value="samsonite">Samsonite</SelectItem>
+                      <SelectItem value="kamiliant">Kamiliant</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2 mt-2">
                   <Label htmlFor="color">Color</Label>
                   <Input
                     id="color"

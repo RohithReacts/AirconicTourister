@@ -99,14 +99,18 @@ export default function ShippingAndReturns() {
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-4 flex items-center gap-3">
                     <ShieldCheck className="text-emerald-500 h-6 w-6" />
-                    30-Day Money-Back Guarantee
+                    3-Day Money-Back Guarantee
                   </h3>
                   <p className="text-muted-foreground mb-4 leading-relaxed">
                     We want you to be completely satisfied with your purchase.
                     If you are not absolutely completely satisfied with your
                     Airconic Tourister product, you may return it within{" "}
-                    <strong>30 days of receipt</strong> for a full refund or
-                    exchange.
+                    <strong>3 days of receipt</strong> for a full refund or
+                    exchange. After 3 days, we follow a{" "}
+                    <strong>
+                      Strict No Return, No Exchange, and No Refund policy
+                    </strong>
+                    .
                   </p>
                   <ul className="space-y-3 mb-6">
                     <li className="flex items-start gap-3">

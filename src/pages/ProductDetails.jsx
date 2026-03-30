@@ -24,6 +24,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
   useDocumentTitle(product?.title || "Product Details");
 
@@ -55,10 +56,14 @@ export default function ProductDetails() {
     }
   }, [id, navigate]);
 
-  const addToCart = () => {
+  const addToCart = async () => {
     if (!product) return;
+    setIsAdding(true);
 
     try {
+      // Artificial delay to show loading state
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       // Get existing cart
       const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
@@ -83,12 +88,23 @@ export default function ProductDetails() {
       // Open cart panel instantly
       window.dispatchEvent(new Event("open_cart"));
 
+      setAdded(true);
       setTimeout(() => setAdded(false), 2000);
     } catch (e) {
       console.error(e);
       toast.error("Could not add to cart");
+    } finally {
+      setIsAdding(false);
     }
   };
+
+  const [activeImage, setActiveImage] = useState(null);
+
+  useEffect(() => {
+    if (product?.image) {
+      setActiveImage(product.image);
+    }
+  }, [product]);
 
   if (loading) {
     return (
@@ -99,6 +115,15 @@ export default function ProductDetails() {
   }
 
   if (!product) return null;
+
+  const images = [
+    product.image,
+    product.image2,
+    product.image3,
+    product.image4,
+    product.image5,
+    product.image6,
+  ].filter(Boolean);
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-12 mt-4 max-w-7xl">
@@ -122,10 +147,13 @@ export default function ProductDetails() {
           <>
             <button
               onClick={() => {
+                const category = product.category.toLowerCase();
                 const route =
-                  product.category.toLowerCase() === "hard-luggage"
+                  category === "hard-luggage"
                     ? "/luggage"
-                    : `/${product.category.toLowerCase()}`;
+                    : category === "duffels" || category === "duffles"
+                      ? "/duffles"
+                      : `/${category}`;
                 navigate(route);
               }}
               className="hover:text-foreground transition-colors cursor-pointer font-medium capitalize outline-none"
@@ -142,12 +170,37 @@ export default function ProductDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
         {/* Product Image Section */}
-        <div className="flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50 rounded-[2rem] p-8 md:p-16 border border-border/40 relative group">
-          <img
-            src={product.image || "https://placehold.co/600x600"}
-            alt={product.title}
-            className="w-full max-w-[500px] object-cover mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-105"
-          />
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-center bg-zinc-50 dark:bg-zinc-900/50 rounded-[2rem] p-8 md:p-12 border border-border/40 relative group overflow-hidden h-[400px] md:h-[500px]">
+            <img
+              src={activeImage || "https://placehold.co/600x600"}
+              alt={product.title}
+              className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal transition-transform duration-700 group-hover:scale-110"
+            />
+          </div>
+
+          {/* Thumbnails Grid */}
+          {images.length > 1 && (
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
+              {images.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveImage(img)}
+                  className={`relative aspect-square rounded-2xl overflow-hidden border-2 transition-all p-2 bg-zinc-50 dark:bg-zinc-900/50 ${
+                    activeImage === img
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-border/40 hover:border-primary/50"
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`${product.title} - ${index + 1}`}
+                    className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Product Info Section */}
@@ -237,12 +290,19 @@ export default function ProductDetails() {
 
             <Button
               className="font-extrabold rounded-md shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-sm transition-all duration-300 w-full sm:w-[240px] h-12 bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-              disabled={product.stock <= 0}
+              disabled={product.stock <= 0 || isAdding}
               onClick={addToCart}
             >
-              <span className="tracking-widest">
-                {product.stock > 0 ? "ADD TO CART" : "OUT OF STOCK"}
-              </span>
+              {isAdding ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="tracking-widest capitalize">ADDING...</span>
+                </div>
+              ) : (
+                <span className="tracking-widest">
+                  {product.stock > 0 ? "ADD TO CART" : "OUT OF STOCK"}
+                </span>
+              )}
             </Button>
           </div>
         </div>

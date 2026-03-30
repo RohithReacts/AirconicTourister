@@ -17,6 +17,8 @@ import Kids from "./pages/Kids";
 import SoftLuggage from "./pages/SoftLuggage";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Checkout from "./pages/Checkout";
 import ProductList from "./admin/ProductList";
 import EditProduct from "./admin/EditProduct";
@@ -42,6 +44,8 @@ function GlobalLayout() {
   const excludedRoutes = [
     "/signin",
     "/signup",
+    "/forgot-password",
+    "/reset-password/:token",
     "/settings",
     "/admin/products/create",
     "/admin/products/edit/:id",
@@ -126,16 +130,20 @@ const router = createBrowserRouter([
         element: <FAQs />,
       },
       {
-        path: "/checkout",
-        element: <Checkout />,
-      },
-      {
         path: "/signup",
         element: <SignUp />,
       },
       {
         path: "/signin",
         element: <SignIn />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+      {
+        path: "/reset-password/:token",
+        element: <ResetPassword />,
       },
       {
         element: <ProtectedRoute />, // General auth guard
@@ -147,6 +155,10 @@ const router = createBrowserRouter([
           {
             path: "/my-orders",
             element: <MyOrders />,
+          },
+          {
+            path: "/checkout",
+            element: <Checkout />,
           },
         ],
       },

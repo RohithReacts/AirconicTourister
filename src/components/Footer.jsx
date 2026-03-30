@@ -25,7 +25,6 @@ export function Footer() {
               of luggage, backpacks, and duffles. Designed for durability and
               style to elevate your journey.
             </p>
-           
           </div>
 
           {/* Quick Links */}
@@ -121,9 +120,8 @@ export function Footer() {
               <li className="flex items-start gap-3 text-slate-500 dark:text-slate-400 text-[15px]">
                 <MapPin className="h-5 w-5 text-slate-900 dark:text-slate-100 shrink-0 mt-0.5" />
                 <span>
-                  123 Travel Avenue, Suite 400
-                  <br />
-                  New York, NY 10001
+                  6-7-66, Raganna Darwaza, Main Road, Hyderabad - Warangal Hwy,
+                  Brahmanawada, Hanamkonda, Telangana 506011
                 </span>
               </li>
               <li className="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-[15px]">

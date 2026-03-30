@@ -10,7 +10,7 @@ export function ModeToggle() {
   const themes = [
     { name: "light", icon: Sun, label: "Light" },
     { name: "dark", icon: Moon, label: "Dark" },
-    { name: "system", icon: Monitor, label: "System" },
+
   ];
 
   return (

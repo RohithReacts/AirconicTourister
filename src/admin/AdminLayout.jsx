@@ -28,10 +28,21 @@ export default function AdminLayout() {
     const fetchProfile = async () => {
       try {
         const response = await api.get("/user/profile");
-        setUser({
-          name: response.data.name || "",
-          avatar: response.data.avatar || "",
-        });
+        // Only update if the response contains data to prevent wiping out stored info
+        if (response.data) {
+          const updatedUser = {
+            name: response.data.name || user.name,
+            avatar: response.data.avatar || user.avatar,
+          };
+          setUser(updatedUser);
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              ...JSON.parse(localStorage.getItem("user")),
+              ...updatedUser,
+            }),
+          );
+        }
       } catch (error) {
         console.error("Error fetching admin profile:", error);
       }
@@ -98,12 +109,11 @@ export default function AdminLayout() {
             )}
           </div>
 
-          <div className="flex items-center gap-3 py-1.5 px-3 backdrop-blur-sm shadow-sm transition-all duration-500 group cursor-default">
+          <div className="flex items-center gap-3 py-1.5 px-3 transition-all duration-500 group cursor-default">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
-                {user.name || "Admin"}
+              <p className="text-sm font-bold tracking-wide text-foreground transition-colors group-hover:text-primary">
+                {user.name ? user.name.split(" ")[0] : "Admin"}
               </p>
-            
             </div>
             <Avatar className="h-11 w-11 rounded-xl border border-border/60 shadow-inner overflow-hidden transition-transform group-hover:scale-105 duration-300">
               <AvatarImage
@@ -111,7 +121,14 @@ export default function AdminLayout() {
                 className="object-cover rounded-xl"
               />
               <AvatarFallback className="bg-slate-800 text-white rounded-xl text-xs font-bold">
-                {user.name?.substring(0, 2).toUpperCase() || "AD"}
+                {user.name
+                  ? user.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .substring(0, 2)
+                      .toUpperCase()
+                  : "AD"}
               </AvatarFallback>
             </Avatar>
           </div>

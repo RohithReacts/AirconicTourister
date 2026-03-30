@@ -6,11 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MapPin, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import api from "../api/axios";
 
 export default function Checkout() {
   useDocumentTitle("Checkout");
   const [cartItems, setCartItems] = useState([]);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,6 +26,28 @@ export default function Checkout() {
     zipCode: "",
   });
   const navigate = useNavigate();
+
+  const fetchAddresses = async () => {
+    try {
+      const { data } = await api.get("/user/address");
+      setSavedAddresses(data);
+      if (data.length > 0) {
+        setSelectedAddressId(data[0]._id);
+        // Populate form with first saved address by default
+        setFormData((prev) => ({
+          ...prev,
+          firstName: data[0].firstName,
+          lastName: data[0].lastName,
+          address: data[0].address,
+          city: data[0].city,
+          state: data[0].state,
+          zipCode: data[0].zipCode,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
 
   useEffect(() => {
     try {
@@ -48,12 +75,81 @@ export default function Checkout() {
           lastName: lastName || prev.lastName,
           email: user.email || prev.email,
         }));
+        fetchAddresses();
       }
     } catch (e) {
       console.error(e);
       navigate("/");
     }
   }, [navigate]);
+
+  const handleAddressSelect = (addr) => {
+    setSelectedAddressId(addr._id);
+    setFormData((prev) => ({
+      ...prev,
+      firstName: addr.firstName,
+      lastName: addr.lastName,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      zipCode: addr.zipCode,
+    }));
+    setShowAddressForm(false);
+  };
+
+  const handleDeleteAddress = async (e, addressId) => {
+    e.stopPropagation();
+    try {
+      await api.delete(`/user/address/${addressId}`);
+      setSavedAddresses((prev) =>
+        prev.filter((addr) => addr._id !== addressId),
+      );
+      if (selectedAddressId === addressId) {
+        setSelectedAddressId(null);
+      }
+      toast.success("Address deleted successfully");
+    } catch (error) {
+      console.error("Error deleting address:", error);
+      toast.error("Failed to delete address");
+    }
+  };
+
+  const handleSaveAddress = async () => {
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.address ||
+      !formData.city ||
+      !formData.state ||
+      !formData.zipCode
+    ) {
+      toast.error("Please fill in all address fields");
+      return;
+    }
+
+    setIsSavingAddress(true);
+    try {
+      const { data } = await api.post("/user/address", {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        label: "Saved Address",
+      });
+      setSavedAddresses(data);
+      const newAddr = data[data.length - 1];
+      setSelectedAddressId(newAddr._id);
+      setShowAddressForm(false);
+      toast.success("Address saved successfully");
+    } catch (error) {
+      console.error("Error saving address:", error);
+      toast.error("Failed to save address");
+    } finally {
+      setIsSavingAddress(false);
+    }
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -118,88 +214,172 @@ export default function Checkout() {
             className="space-y-8"
           >
             <Card className="shadow-sm border-muted">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xl">Shipping Details</CardTitle>
+                {savedAddresses.length > 0 && !showAddressForm && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAddressForm(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" /> Add New
+                  </Button>
+                )}
               </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      required
-                      value={formData.firstName}
-                      onChange={handleChange}
-                    />
+              <CardContent className="space-y-6">
+                {/* Saved Addresses Cards */}
+                {savedAddresses.length > 0 && !showAddressForm && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {savedAddresses.map((addr) => (
+                      <div
+                        key={addr._id}
+                        onClick={() => handleAddressSelect(addr)}
+                        className={`relative p-4 rounded-xl border-2 transition-all cursor-pointer hover:shadow-md ${
+                          selectedAddressId === addr._id
+                            ? "border-primary bg-primary/5 shadow-sm"
+                            : "border-muted bg-white hover:border-muted-foreground/30"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            <span className="font-bold text-sm">
+                              {addr.label || "Address"}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {selectedAddressId === addr._id && (
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteAddress(e, addr._id)}
+                              className="text-muted-foreground hover:text-destructive transition-colors p-1"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="text-sm space-y-1 text-muted-foreground">
+                          <p className="font-semibold text-foreground">
+                            {addr.firstName} {addr.lastName}
+                          </p>
+                          <p className="line-clamp-1">{addr.address}</p>
+                          <p>
+                            {addr.city}, {addr.state} {addr.zipCode}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      required
-                      value={formData.lastName}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
+                )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                </div>
+                {/* Shipping Form */}
+                {(savedAddresses.length === 0 || showAddressForm) && (
+                  <div className="space-y-5 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          required
+                          value={formData.firstName}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          required
+                          value={formData.lastName}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="address">Street Address</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    required
-                    value={formData.address}
-                    onChange={handleChange}
-                  />
-                </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="space-y-2 sm:col-span-1">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      required
-                      value={formData.city}
-                      onChange={handleChange}
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="address">Street Address</Label>
+                      <Input
+                        id="address"
+                        name="address"
+                        required
+                        value={formData.address}
+                        onChange={handleChange}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="space-y-2 sm:col-span-1">
+                        <Label htmlFor="city">City</Label>
+                        <Input
+                          id="city"
+                          name="city"
+                          required
+                          value={formData.city}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-1">
+                        <Label htmlFor="state">State</Label>
+                        <Input
+                          id="state"
+                          name="state"
+                          required
+                          value={formData.state}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div className="space-y-2 sm:col-span-1">
+                        <Label htmlFor="zipCode">Pin Code</Label>
+                        <Input
+                          id="zipCode"
+                          name="zipCode"
+                          required
+                          value={formData.zipCode}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-2">
+                      <Button
+                        type="button"
+                        onClick={handleSaveAddress}
+                        disabled={isSavingAddress}
+                        className="flex-1 font-bold"
+                      >
+                        {isSavingAddress ? "Saving..." : "Save this Address"}
+                      </Button>
+                      {savedAddresses.length > 0 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setShowAddressForm(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="space-y-2 sm:col-span-1">
-                    <Label htmlFor="state">State / Province</Label>
-                    <Input
-                      id="state"
-                      name="state"
-                      required
-                      value={formData.state}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="space-y-2 sm:col-span-1">
-                    <Label htmlFor="zipCode">Postal Code</Label>
-                    <Input
-                      id="zipCode"
-                      name="zipCode"
-                      required
-                      value={formData.zipCode}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
+                )}
               </CardContent>
             </Card>
           </form>

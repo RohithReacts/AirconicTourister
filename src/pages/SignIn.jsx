@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Link, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import api from "../api/axios";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ export default function SignIn() {
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -33,6 +34,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const res = await api.post("/auth/signin", formData);
       console.log(res, "data");
@@ -57,15 +59,14 @@ export default function SignIn() {
         error.response?.data?.message ||
           "Failed to sign in. Please check your credentials and try again.",
       );
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-sm shadow-lg border-muted">
-        <CardHeader className="space-y-2 text-center flex flex-col items-center">
-          <BrandLogo className="mb-4" />
-        </CardHeader>
+        
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -98,18 +99,32 @@ export default function SignIn() {
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
+                    <EyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-5 w-5" />
+                    <Eye className="h-4 w-4" />
                   )}
                 </button>
               </div>
+              <Link
+                to="/forgot-password"
+                className="text-sm text-muted-foreground font-poppins font-medium flex justify-end text-right"
+              >
+                Forgot Password?
+              </Link>
             </div>
             <Button
               type="submit"
               className="w-full mt-6 shadow-sm cursor-pointer"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin h-4 w-4 mr-2" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </CardContent>

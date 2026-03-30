@@ -52,9 +52,7 @@ function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm shadow-lg border-muted">
-        <CardHeader className="space-y-2 text-center flex flex-col items-center">
-          <BrandLogo className="mb-4" />
-        </CardHeader>
+       
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">

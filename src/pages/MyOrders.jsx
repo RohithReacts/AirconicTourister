@@ -420,8 +420,8 @@ export default function MyOrders() {
                     <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold mb-0.5">
                       Total Amount
                     </p>
-                    <p className="font-extrabold text-lg text-primary">
-                      ₹{(order.totalAmount || 0).toLocaleString("en-IN")}
+                    <p className="font-semibold text-lg tracking-wide text-primary">
+                      ₹ {(order.totalAmount || 0).toLocaleString("en-IN")}
                     </p>
                   </div>
                   <div className="flex gap-2">

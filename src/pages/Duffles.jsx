@@ -31,7 +31,7 @@ export default function Duffles() {
         setAllFetchedProducts(allProducts);
         const dufflesProducts = allProducts.filter((p) => {
           const cat = p.category?.toLowerCase() || "";
-          return cat === "duffles" || cat === "duffle";
+          return cat === "duffles" || cat === "duffels" || cat === "duffle";
         });
         setProducts(dufflesProducts);
       } catch (error) {

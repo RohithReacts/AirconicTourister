@@ -275,6 +275,9 @@ export default function ProductList() {
                   Category
                 </TableHead>
                 <TableHead className="font-semibold text-foreground">
+                  Brand
+                </TableHead>
+                <TableHead className="font-semibold text-foreground">
                   MRP
                 </TableHead>
                 <TableHead className="font-semibold text-foreground">
@@ -342,6 +345,9 @@ export default function ProductList() {
                     </TableCell>
                     <TableCell className="text-muted-foreground uppercase text-xs font-bold tracking-wider">
                       {product.category}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground uppercase text-xs font-bold tracking-wider">
+                      {product.brand}
                     </TableCell>
                     <TableCell className="text-muted-foreground line-through decoration-muted-foreground/50">
                       ₹{Number(product.pricemrp).toLocaleString("en-IN")}

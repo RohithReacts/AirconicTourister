@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ReusableCarousel } from "@/components/ReusableCarousel";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function ShopProducts({
   title = "Shop Products",
@@ -40,7 +41,7 @@ export function ShopProducts({
             <Link to="/luggage">
               <Button
                 size="lg"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full sm:w-auto rounded-md shrink-0 px-8 py-6 text-sm md:text-base"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold w-full sm:w-auto rounded-md shrink-0 px-8 py-6 text-sm md:text-base cursor-pointer"
               >
                 SHOP NOW
               </Button>
@@ -82,12 +83,59 @@ export function ProductCard({
   link,
 }) {
   const navigate = useNavigate();
+  const [isAdding, setIsAdding] = useState(false);
 
-  const handleIconClick = (e) => {
+  const handleIconClick = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (id) {
-      navigate(`/product/${id}`);
+
+    if (!id) return;
+
+    setIsAdding(true);
+
+    try {
+      // Artificial delay to show loading state
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Get existing cart
+      const existingCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      // Check if product already in cart
+      const existingProductIndex = existingCart.findIndex(
+        (item) => item._id === id,
+      );
+
+      const productToAdd = {
+        _id: id,
+        title,
+        image,
+        salePrice: price || 0,
+        pricemrp: mrp || 0,
+        color: color || "",
+      };
+
+      if (existingProductIndex >= 0) {
+        existingCart[existingProductIndex].quantity =
+          (existingCart[existingProductIndex].quantity || 1) + 1;
+      } else {
+        existingCart.push({ ...productToAdd, quantity: 1 });
+      }
+
+      // Save cart
+      localStorage.setItem("cart", JSON.stringify(existingCart));
+
+      // Dispatch event so Navbar can update
+      window.dispatchEvent(new Event("cart_update"));
+
+      // Open cart panel instantly
+      window.dispatchEvent(new Event("open_cart"));
+
+      toast.success("Added to cart");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to add to cart");
+    } finally {
+      setIsAdding(false);
     }
   };
 
@@ -136,9 +184,24 @@ export function ProductCard({
           <div className="absolute bottom-3 right-3 md:bottom-4 md:right-4 z-10">
             <button
               onClick={handleIconClick}
-              className="bg-white/95 p-2 md:p-3 rounded-b-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-110 active:scale-95 transition-transform group/btn"
+              disabled={isAdding}
+              className={cn(
+                "bg-white/95 text-black shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:scale-105 active:scale-95 transition-all group/btn flex items-center justify-center gap-2",
+                isAdding
+                  ? "rounded-md px-3 py-2 md:px-4 md:py-2.5"
+                  : "p-2 md:p-3 rounded-b-full",
+              )}
             >
-              <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 text-black transition-colors" />
+              {isAdding ? (
+                <>
+                  <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" />
+                  <span className="text-[10px] md:text-xs font-bold whitespace-nowrap">
+                    Quick To Cart
+                  </span>
+                </>
+              ) : (
+                <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 text-black transition-colors" />
+              )}
             </button>
           </div>
         )}
