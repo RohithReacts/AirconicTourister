@@ -129,8 +129,8 @@ export function Navbar() {
     { name: "Luggage", href: "/luggage" },
     { name: "Backpacks", href: "/backpacks" },
     { name: "Duffles", href: "/duffles" },
-    { name: "Office", href: "/office"},
-    { name: "Accessories", href: "/accessories"},
+    { name: "Office", href: "/office" },
+    { name: "Accessories", href: "/accessories" },
     { name: "Track Order", href: "/track-order" },
   ];
 
@@ -140,37 +140,81 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-gray-800 bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-sm transition-all duration-300">
-      <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Left: Brand Logo */}
+      <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between relative px-4 sm:px-6 lg:px-8">
+        {/* Left: Navigation Menu (Hamburger) & Desktop Links */}
         <div className="flex items-center">
-          <BrandLogo className="scale-90 transform origin-left transition-transform hover:scale-95 duration-300" />
-        </div>
+          <div className="lg:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  className="flex h-10 w-10 md:h-12 md:w-12 items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white transition-all duration-300"
+                  aria-label="Menu"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-6 w-6"
+                  >
+                    <line x1="4" x2="20" y1="12" y2="12" />
+                    <line x1="4" x2="20" y1="6" y2="6" />
+                    <line x1="4" x2="20" y1="18" y2="18" />
+                  </svg>
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                <SheetHeader className="text-left border-b pb-4 mb-4">
+                  <BrandLogo className="scale-90 transform origin-left" />
+                </SheetHeader>
 
-        {/* Right: Navigation + Icons */}
-        <div className="flex items-center gap-2 lg:gap-6">
-          {/* Navigation Menu (Hidden on mobile) */}
-          <div className="hidden lg:flex">
-            <NavigationMenu>
-              <NavigationMenuList className="gap-1 xl:gap-2">
-                {currentLinks.map((link) => (
-                  <NavigationMenuItem key={link.href}>
-                    <NavigationMenuLink
-                      asChild
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "bg-transparent text-[15px] font-medium text-slate-700 dark:text-slate-300 hover:text-black dark:hover:text-white hover:bg-slate-100/50 dark:hover:bg-slate-800/50",
-                      )}
+                <nav className="flex flex-col justify-center items-center gap-4">
+                  {currentLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className="text-lg font-medium px-2 py-1 hover:text-primary transition-colors flex items-center gap-3"
                     >
-                      <Link to={link.href}>{link.name}</Link>
-                    </NavigationMenuLink>
-                  </NavigationMenuItem>
-                ))}
-              </NavigationMenuList>
-            </NavigationMenu>
+                      {link.icon && <link.icon size={20} />}
+                      {link.name}
+                    </Link>
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
           </div>
 
-          {/* Action Icons */}
-          <div className="flex items-center gap-1 sm:gap-3 lg:gap-5 lg:border-l lg:border-slate-200 dark:lg:border-slate-800 lg:pl-6 lg:ml-2">
+          <div className="hidden lg:flex items-center ml-2">
+            <BrandLogo className="scale-90 transform origin-left transition-transform hover:scale-100 duration-300" />
+          </div>
+        </div>
+
+        {/* Center: Brand Logo (Mobile only) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center lg:hidden">
+          <BrandLogo className="scale-90 transform origin-center transition-transform hover:scale-100 duration-300" />
+        </div>
+
+        {/* Right: Navigation Links & Action Icons */}
+        <div className="flex items-center gap-4 lg:gap-8">
+          <nav className="hidden lg:flex items-center gap-6">
+            {currentLinks.map((link) => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-300 hover:text-primary transition-colors uppercase relative group"
+              >
+                {link.name}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+              </Link>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-1 sm:gap-3 lg:gap-5">
             <ModeToggle />
             {!isAdmin && (
               <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
@@ -493,53 +537,6 @@ export function Navbar() {
                 </SheetContent>
               </Sheet>
             )}
-
-            {/* Mobile Navigation Menu */}
-            <div className="lg:hidden">
-              <Sheet>
-                <SheetTrigger asChild>
-                  <button
-                    className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-black dark:hover:text-white transition-all duration-300"
-                    aria-label="Menu"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="h-6 w-6"
-                    >
-                      <line x1="4" x2="20" y1="12" y2="12" />
-                      <line x1="4" x2="20" y1="6" y2="6" />
-                      <line x1="4" x2="20" y1="18" y2="18" />
-                    </svg>
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                  <SheetHeader className="text-left border-b pb-4 mb-4">
-                    <BrandLogo className="scale-90 transform origin-left" />
-                  </SheetHeader>
-
-                  <nav className="flex flex-col gap-4">
-                    {currentLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        to={link.href}
-                        className="text-lg font-medium px-2 py-1 hover:text-primary transition-colors flex items-center gap-3"
-                      >
-                        {link.icon && <link.icon size={20} />}
-                        {link.name}
-                      </Link>
-                    ))}
-                  </nav>
-                </SheetContent>
-              </Sheet>
-            </div>
           </div>
         </div>
       </div>

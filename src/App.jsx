@@ -5,40 +5,58 @@ import {
   useLocation,
   matchPath,
 } from "react-router";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import Home from "./pages/Home";
-import Luggage from "./pages/Luggage";
-import Backpacks from "./pages/Backpacks";
-import Collection from "./pages/Collection";
-import Duffles from "./pages/Duffles";
-import Accessories from "./pages/Accessories";
-import Office from "./pages/Office";
-import Kids from "./pages/Kids";
-import SoftLuggage from "./pages/SoftLuggage";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Checkout from "./pages/Checkout";
-import ProductList from "./admin/ProductList";
-import EditProduct from "./admin/EditProduct";
-import AddProduct from "./admin/AddProduct";
-import ProductDetails from "./pages/ProductDetails";
-import TrackOrder from "./pages/TrackOrder";
-import ShippingAndReturns from "./pages/ShippingAndReturns";
-import FAQs from "./pages/FAQs";
+
+const Home = lazy(() => import("./pages/Home"));
+const Luggage = lazy(() => import("./pages/Luggage"));
+const Backpacks = lazy(() => import("./pages/Backpacks"));
+const Collection = lazy(() => import("./pages/Collection"));
+const Duffles = lazy(() => import("./pages/Duffles"));
+const Accessories = lazy(() => import("./pages/Accessories"));
+const Office = lazy(() => import("./pages/Office"));
+const Kids = lazy(() => import("./pages/Kids"));
+const SoftLuggage = lazy(() => import("./pages/SoftLuggage"));
+const SignUp = lazy(() => import("./pages/SignUp"));
+const SignIn = lazy(() => import("./pages/SignIn"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const ProductList = lazy(() => import("./admin/ProductList"));
+const EditProduct = lazy(() => import("./admin/EditProduct"));
+const AddProduct = lazy(() => import("./admin/AddProduct"));
+const ProductDetails = lazy(() => import("./pages/ProductDetails"));
+const TrackOrder = lazy(() => import("./pages/TrackOrder"));
+const ShippingAndReturns = lazy(() => import("./pages/ShippingAndReturns"));
+const FAQs = lazy(() => import("./pages/FAQs"));
+const AccountSettings = lazy(() => import("./admin/AccountSettings"));
+const MyOrders = lazy(() => import("./pages/MyOrders"));
+const AdminDashboard = lazy(() => import("./admin/AdminDashboard"));
+const AdminOrders = lazy(() => import("./admin/AdminOrders"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import AccountSettings from "./admin/AccountSettings";
-import MyOrders from "./pages/MyOrders";
-import AdminDashboard from "./admin/AdminDashboard";
 import AdminLayout from "./admin/AdminLayout";
-import AdminOrders from "./admin/AdminOrders";
 import ProtectedRoute from "./components/ProtectedRoute";
-import NotFound from "./pages/NotFound";
+import LoadingPage from "./components/LoadingPage";
 
 function GlobalLayout() {
   const location = useLocation();
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsInitialLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isInitialLoading) {
+    return (
+      <div className="fixed inset-0 z-50 bg-background flex flex-col">
+        <LoadingPage />
+      </div>
+    );
+  }
 
   // Specific routes where you want to hide the navbar
   const excludedRoutes = [
@@ -59,8 +77,10 @@ function GlobalLayout() {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       {showNavbar && <Navbar />}
-      <main className="flex-1">
-        <Outlet />
+      <main className="flex-1 flex flex-col">
+        <Suspense fallback={<LoadingPage />}>
+          <Outlet />
+        </Suspense>
       </main>
       {showNavbar && <Footer />}
       <Toaster />
